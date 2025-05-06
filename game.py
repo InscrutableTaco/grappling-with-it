@@ -1,6 +1,7 @@
 import pygame
 import sys
-from utils import load_image
+from scripts.utils import load_image
+from scripts.entities import Entity, Enemy, Player
 
 class Game:
     def __init__(self):
@@ -14,14 +15,21 @@ class Game:
             'grapple-icon': load_image("grappling_hook.png")
         }
 
+        self.player = Player(self, (50, 50), (16, 30))
+
     def run(self):
         while True:
             self.screen.fill((0, 0, 0))
             
+            self.player.update()
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+
+                if event.type == pygame.KEYDOWN:
+                    self.player
 
             self.display.blit(self.assets['grapple-icon'], (100, 100))
             
@@ -29,5 +37,4 @@ class Game:
             pygame.display.update()
             self.clock.tick(60)
 
-game = Game()
-game.run()
+Game.run()
