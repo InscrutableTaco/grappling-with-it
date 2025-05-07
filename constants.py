@@ -1,0 +1,2 @@
+GRAVITY = 0.1
+TERM_VEL = 15

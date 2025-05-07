@@ -7,7 +7,7 @@ MUSIC_PATH = "data/sound/music"
 
 def load_image(path):
     img = pygame.image.load(ART_PATH + path).convert()
-    img.set_colorkey((0, 0, 0))
+    img.set_colorkey((134, 246, 216, 1))
     return img
 
 def load_images(path):
