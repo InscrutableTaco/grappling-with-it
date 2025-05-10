@@ -4,8 +4,8 @@ import os
 from scripts.constants import TILE_SIZE
 
 ART_PATH = "data/art/"
-SFX_PATH = "data/sound/sfx/"
-MUSIC_PATH = "data/sound/music/"
+SFX_PATH = "data/sfx/"
+MUSIC_PATH = "data/music/"
 
 def load_image(path):
     img = pygame.image.load(ART_PATH + path).convert()

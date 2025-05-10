@@ -1,7 +1,7 @@
 import pygame
 from enum import Enum
 from scripts.constants import TILE_SIZE
-from scripts.utils import to_grid
+from scripts.utils import to_grid, to_pos
 
 NEIGHBOR_OFFSETS = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (0, 0), (-1, 1), (0, 1), (1, 1)]
 
@@ -36,9 +36,51 @@ class Tilemap:
 
         # test tiles
         for i in range(15):
-            loc = (100 + (i * self.tile_size), 600)
+            loc = (4 * self.tile_size + (i * self.tile_size), 16 * self.tile_size)
             tile = Tile(Tile_type.DIRT, loc)
             self.tilemap[str(tile.grid_pos)] = tile
+        for i in range(15):
+            loc = (4 * self.tile_size + (i * self.tile_size), 17 * self.tile_size)
+            tile = Tile(Tile_type.DIRT, loc, 4)
+            self.tilemap[str(tile.grid_pos)] = tile
+
+        for i in range(6):
+            loc = (18 * self.tile_size + (i * self.tile_size), 12 * self.tile_size)
+            tile = Tile(Tile_type.DIRT, loc)
+            self.tilemap[str(tile.grid_pos)] = tile
+        for i in range(6):
+            loc = (18 * self.tile_size + (i * self.tile_size), 13 * self.tile_size)
+            tile = Tile(Tile_type.DIRT, loc, 4)
+            self.tilemap[str(tile.grid_pos)] = tile
+
+        for i in range(6):
+            loc = (5 * self.tile_size + (i * self.tile_size), 9 * self.tile_size)
+            tile = Tile(Tile_type.DIRT, loc)
+            self.tilemap[str(tile.grid_pos)] = tile
+        for i in range(6):
+            loc = (5 * self.tile_size + (i * self.tile_size), 10 * self.tile_size)
+            tile = Tile(Tile_type.DIRT, loc, 4)
+            self.tilemap[str(tile.grid_pos)] = tile
+
+        self.add_tile((4, 9), 7)
+        self.add_tile((4, 10), 5)
+        self.add_tile((11, 9), 1)
+        self.add_tile((11, 10), 3)
+
+        self.add_tile((3, 16), 7)
+        self.add_tile((3, 17), 5)
+        self.add_tile((19, 16), 1)
+        self.add_tile((19, 17), 3)
+
+        self.add_tile((17, 12), 7)
+        self.add_tile((17, 13), 5)
+        self.add_tile((24, 12), 1)
+        self.add_tile((24, 13), 3)
+        
+    def add_tile(self, grid_pos, variant):
+        tile = Tile(Tile_type.DIRT, to_pos(grid_pos), variant)
+        self.tilemap[str(tile.grid_pos)] = tile
+
 
     def tiles_around(self, pos): #return list of tiles around a position
         tiles = []
