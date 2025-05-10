@@ -1,11 +1,7 @@
 import pygame
 import os
 
-from scripts.constants import TILE_SIZE
-
-ART_PATH = "data/art/"
-SFX_PATH = "data/sfx/"
-MUSIC_PATH = "data/music/"
+from scripts.constants import TILE_SIZE, ART_PATH, SFX_PATH, MUSIC_PATH
 
 def load_image(path):
     img = pygame.image.load(ART_PATH + path).convert()
@@ -18,6 +14,10 @@ def load_images(path):
         if img_name.lower().endswith(('.png', '.jpg', '.bmp', '.gif')):
             images.append(load_image(path + '/' + img_name))
     return images
+
+def load_sound(path):
+    sound = pygame.mixer.Sound(SFX_PATH + path)
+    return sound
 
 def to_grid(pos):
     return [int(pos[0] // TILE_SIZE), int(pos[1] // TILE_SIZE)]

@@ -1,5 +1,5 @@
 import pygame
-from scripts.constants import GRAVITY, TERM_VEL, JUMP_VEL
+from scripts.constants import GRAVITY, TERM_VEL, JUMP_VEL, WALK_SPEED
 
 class Entity:
     def __init__(self, game, kind, pos, size):
@@ -8,6 +8,7 @@ class Entity:
         self.pos = list(pos)
         self.size = size
         self.velocity = [0, 0]
+        self.walk_speed = 0
         self.collisions = {
             'up': False,
             'down': False,
@@ -68,22 +69,24 @@ class Entity:
 
         #print(f"end of update, y velocity is {self.velocity[1]} and y position is {self.pos[1]}")
 
-    def render(self, surf):
-        surf.blit(self.game.assets['grapple-icon'], self.pos)
+    def render(self, surf, offset=(0, 0)):
+        real_pos = (self.pos[0] - offset[0], self.pos[1] - offset[1])
+        surf.blit(self.game.assets['grapple-icon'], real_pos)
 
 class Player(Entity):
     def __init__(self, game, pos, size):
         super().__init__(game, 'player', pos, size)
+        self.walk_speed = WALK_SPEED
         self.jumps = 1
-        self.max_jumps = 1
+        self.max_jumps = 2
 
     def update(self, tilemap, movement=(0, 0)):
         super().update(tilemap, movement)
         if self.collisions['down'] == True:
             self.jumps = self.max_jumps
     
-    def render(self, surf):
-        super().render(surf)
+    def render(self, surf, offset=(0, 0)):
+        super().render(surf, offset)
     
     def jump(self):
         if self.jumps >= 1 and self.collisions['down'] == True:
@@ -103,5 +106,5 @@ class Enemy(Entity):
     def update(self, movement=(0, 0)):
         return super().update(movement)
     
-    def render(self, surf):
-        return super().render(surf)
+    def render(self, surf, offset=(0, 0)):
+        return super().render(surf, offset)
