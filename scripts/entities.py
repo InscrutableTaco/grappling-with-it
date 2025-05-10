@@ -15,7 +15,17 @@ class Entity:
             'left': False,
             'right': False
         }
+        self.action = ''
+        self.anim_offset = (-3, -3)
+        self.flip = False
+        self.set_action('idle')
+
         self.air_time = 0
+
+    def set_action(self, action):
+        if action != self.action:
+            self.action = action
+            self.animation = self.game.assets[self.kind + '/' + self.action].copy()
 
     def reset_collisions(self):
         for direction in self.collisions:
@@ -67,11 +77,12 @@ class Entity:
         if self.collisions['down'] or self.collisions['up']:
             self.velocity[1] = 1 # this should be zero
 
+        self.animation.update()
         #print(f"end of update, y velocity is {self.velocity[1]} and y position is {self.pos[1]}")
 
     def render(self, surf, offset=(0, 0)):
         real_pos = (self.pos[0] - offset[0], self.pos[1] - offset[1])
-        surf.blit(self.game.assets['grapple-icon'], real_pos)
+        surf.blit(pygame.transform.flip(self.animation.img(), self.flip, False), real_pos)
 
 class Player(Entity):
     def __init__(self, game, pos, size):
