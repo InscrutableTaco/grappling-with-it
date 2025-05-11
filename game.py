@@ -19,11 +19,12 @@ class Game:
         self.assets = {
             'grapple-icon': load_image('grappling_hook.png'),
             'dirt': load_images('tiles/dirt'),
-            'player/walk': Animation(load_images('player/walk'), img_dur=12),
-            'player/idle': Animation(load_images('player/walk'), img_dur=100),
+            'player/jump': Animation(load_images('player/jump'), img_dur=1000),
+            'player/walk': Animation(load_images('player/walk'), img_dur=10),
+            'player/idle': Animation(load_images('player/idle'), img_dur=12),
         }
 
-        self.player = Player(self, to_pos((3, 15)), (32, 32))
+        self.player = Player(self, to_pos((3, 15)), (17, 32))
 
         self.sfx = {
             'jump': load_sound('jump.wav')
@@ -58,5 +59,6 @@ class Game:
             pygame.display.update()
             self.clock.tick(60)
             #print(to_grid(self.player.pos))
+            print(self.player.action)
 
 Game().run()

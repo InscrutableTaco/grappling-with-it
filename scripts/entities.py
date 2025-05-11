@@ -34,6 +34,18 @@ class Entity:
     def rect(self):
         return pygame.Rect(self.pos[0], self.pos[1], self.size[0], self.size[1])
 
+    def check_direction(self, x_input):
+            if abs(x_input) > 0 and self.collisions['down']:
+                self.set_action('walk')
+            elif self.collisions['down']:
+                self.set_action('idle')
+            elif abs(x_input) > 0 and not self.collisions['down']:
+                self.set_action('jump')
+            if x_input < 0:
+                self.flip = True
+            if x_input > 0:
+                self.flip = False
+
     def check_collisions(self, axis, movement, tilemap):
             if axis == 'x':
                 hitbox = self.rect()
@@ -65,6 +77,9 @@ class Entity:
         self.reset_collisions()
         
         move_x = self.velocity[0] + movement[0]
+        
+        
+
         self.pos[0] += move_x
         self.check_collisions('x', move_x, tilemap)
         
@@ -72,12 +87,15 @@ class Entity:
         self.pos[1] += move_y
         self.check_collisions('y', move_y, tilemap)
 
+        self.check_direction(move_x)
+
         self.velocity[1] = min(TERM_VEL, self.velocity[1] + GRAVITY)
 
         if self.collisions['down'] or self.collisions['up']:
             self.velocity[1] = 1 # this should be zero
 
-        self.animation.update()
+        if self.action != 'jump':
+            self.animation.update()
         #print(f"end of update, y velocity is {self.velocity[1]} and y position is {self.pos[1]}")
 
     def render(self, surf, offset=(0, 0)):
@@ -104,7 +122,8 @@ class Player(Entity):
             self.game.sfx['jump'].play()
             self.velocity[1] = JUMP_VEL
             self.jumps -= 1
-            #self.collisions['down'] = False
+            self.set_action('jump')
+            self.collisions['down'] = False
             #self.air_time = 40
 
     #def end_jump(self):
