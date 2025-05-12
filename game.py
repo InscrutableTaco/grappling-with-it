@@ -17,9 +17,9 @@ class Game:
         self.movement = [False, False]
         self.bindings = Bindings(self)
         self.assets = {
-            'grapple-icon': load_image('grappling_hook.png'),
+            'grapple-icon': load_image('grapple/grapple.png'),
             'dirt': load_images('tiles/dirt'),
-            'player/jump': Animation(load_images('player/jump'), img_dur=1000),
+            'player/jump': Animation(load_images('player/jump'), img_dur=-1),
             'player/walk': Animation(load_images('player/walk'), img_dur=10),
             'player/idle': Animation(load_images('player/idle'), img_dur=12),
         }
@@ -59,6 +59,6 @@ class Game:
             pygame.display.update()
             self.clock.tick(60)
             #print(to_grid(self.player.pos))
-            print(self.player.action)
-
+            #print(self.player.action)
+            
 Game().run()

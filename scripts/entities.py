@@ -1,5 +1,6 @@
 import pygame
 from scripts.constants import GRAVITY, TERM_VEL, JUMP_VEL, WALK_SPEED
+from scripts.grapple import Grapple
 
 class Entity:
     def __init__(self, game, kind, pos, size):
@@ -39,8 +40,8 @@ class Entity:
                 self.set_action('walk')
             elif self.collisions['down']:
                 self.set_action('idle')
-            elif abs(x_input) > 0 and not self.collisions['down']:
-                self.set_action('jump')
+            #elif abs(x_input) > 0 and not self.collisions['down']:
+             #   self.set_action('jump')
             if x_input < 0:
                 self.flip = True
             if x_input > 0:
@@ -125,6 +126,9 @@ class Player(Entity):
             self.set_action('jump')
             self.collisions['down'] = False
             #self.air_time = 40
+
+    def fire_grapple(self, game):
+        self.grapple = Grapple(self.game, self.pos, (32, 32))
 
     #def end_jump(self):
      #   pass
