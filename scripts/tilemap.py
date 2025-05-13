@@ -15,7 +15,7 @@ class Tile_type(Enum):
 class Tile:
     def __init__(self, tile_type, pos=(0, 0), variant=0, tile_size=TILE_SIZE):
         self.type = tile_type
-        self.str_type = str(self.type).lower().split('.')[1]
+        self.str_type = str(self.type).lower().split('.')[1] # yuck!
         self.pos = pos
         self.grid_pos = to_grid(pos)
         self.variant = variant

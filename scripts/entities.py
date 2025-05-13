@@ -1,6 +1,5 @@
 import pygame
 from scripts.constants import GRAVITY, TERM_VEL, JUMP_VEL, WALK_SPEED
-from scripts.grapple import Grapple
 
 class Entity:
     def __init__(self, game, kind, pos, size):
@@ -17,11 +16,11 @@ class Entity:
             'right': False
         }
         self.action = ''
-        self.anim_offset = (-3, -3)
+        #self.anim_offset = (-3, -3)
         self.flip = False
-        self.set_action('idle')
-
-        self.air_time = 0
+        
+        if self.kind == 'player':
+            self.set_action('idle')
 
     def set_action(self, action):
         if action != self.action:
@@ -35,17 +34,17 @@ class Entity:
     def rect(self):
         return pygame.Rect(self.pos[0], self.pos[1], self.size[0], self.size[1])
 
-    def check_direction(self, x_input):
-            if abs(x_input) > 0 and self.collisions['down']:
-                self.set_action('walk')
-            elif self.collisions['down']:
-                self.set_action('idle')
-            #elif abs(x_input) > 0 and not self.collisions['down']:
-             #   self.set_action('jump')
-            if x_input < 0:
-                self.flip = True
-            if x_input > 0:
-                self.flip = False
+    def update_action(self, x_input):
+        if abs(x_input) > 0 and self.collisions['down']:
+            self.set_action('walk')
+        elif self.collisions['down']:
+            self.set_action('idle')
+    
+    def set_facing(self, x_input):
+        if x_input < 0:
+            self.flip = True
+        if x_input > 0:
+            self.flip = False
 
     def check_collisions(self, axis, movement, tilemap):
             if axis == 'x':
@@ -76,27 +75,26 @@ class Entity:
                     
     def update(self, tilemap, movement=(0, 0)):
         self.reset_collisions()
-        
-        move_x = self.velocity[0] + movement[0]
-        
-        
 
+        #save x and y movement
+        move_x, move_y = self.velocity[0] + movement[0], self.velocity[1] + movement[1]
+    
+        #move horizontally, process collisions
         self.pos[0] += move_x
         self.check_collisions('x', move_x, tilemap)
         
-        move_y = self.velocity[1] + movement[1]
+        #move vertically, process collisions
         self.pos[1] += move_y
         self.check_collisions('y', move_y, tilemap)
 
-        self.check_direction(move_x)
+        #update action and direction based on movement / collisions
+        if self.kind == 'player':
+            self.update_action(move_x)
+            self.set_facing(move_x)
 
-        self.velocity[1] = min(TERM_VEL, self.velocity[1] + GRAVITY)
+        #update animation
+        self.animation.update()
 
-        if self.collisions['down'] or self.collisions['up']:
-            self.velocity[1] = 1 # this should be zero
-
-        if self.action != 'jump':
-            self.animation.update()
         #print(f"end of update, y velocity is {self.velocity[1]} and y position is {self.pos[1]}")
 
     def render(self, surf, offset=(0, 0)):
@@ -112,8 +110,17 @@ class Player(Entity):
 
     def update(self, tilemap, movement=(0, 0)):
         super().update(tilemap, movement)
+
+        #reset jumps
         if self.collisions['down'] == True:
             self.jumps = self.max_jumps
+        #update velocity w/ gravity
+        self.velocity[1] = min(TERM_VEL, self.velocity[1] + GRAVITY)
+
+        #reset y velocity if colliding up or down. 
+        if self.collisions['down'] or self.collisions['up']:
+            self.velocity[1] = 1 # this *should* be 0, but this currently causes the player to
+                                # wiggle up and down, breaking collision on the ensuing frames :(
     
     def render(self, surf, offset=(0, 0)):
         super().render(surf, offset)
@@ -125,13 +132,29 @@ class Player(Entity):
             self.jumps -= 1
             self.set_action('jump')
             self.collisions['down'] = False
-            #self.air_time = 40
 
     def fire_grapple(self, game):
-        self.grapple = Grapple(self.game, self.pos, (32, 32))
+        offset = (-14, 12) if self.flip else (14, 12)
+        direction = ('left' if self.flip else 'right')
+        pos = (self.pos[0] + offset[0], self.pos[1] + offset[1])
+        
+        self.rope = Rope(self.game, pos, direction, (32, 32))
 
-    #def end_jump(self):
-     #   pass
+class Rope(Entity):
+    def __init__(self, game, pos, direction, size=(32, 32)):
+        kind = 'rope'
+        super().__init__(game, kind, pos, size)
+        self.direction = direction
+        self.velocity = [-50, -50] if self.direction == 'left' else [50, -50] 
+        print(self.direction)
+
+
+
+
+
+
+
+
 
 class Enemy(Entity):
     def __init__(self, game, pos, size):
