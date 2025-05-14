@@ -24,7 +24,7 @@ class Bindings:
             'left': [{pygame.K_LEFT, pygame.K_a}, press_left, depress_left],
             'right': [{pygame.K_RIGHT, pygame.K_d}, press_right, depress_right],
             'jump': [{pygame.K_SPACE, pygame.K_UP, pygame.K_w}, press_jump, depress_jump],
-            'grapple': [{pygame.K_x}, press_grapple, depress_grapple],
+            'grapple': [{pygame.K_x, pygame.K_g}, press_grapple, depress_grapple],
         }   
 
     def read_input(self, game, event):

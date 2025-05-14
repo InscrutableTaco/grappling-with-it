@@ -17,20 +17,26 @@ class Game:
         self.movement = [False, False]
         self.bindings = Bindings(self)
         self.assets = {
-            'grapple-icon': load_image('grapple/grapple.png'),
+            'grapple-icon': load_image('grapple/grapple-icon.png'),
             'dirt': load_images('tiles/dirt'),
             'player/jump': Animation(load_images('player/jump'), img_dur=-1),
             'player/walk': Animation(load_images('player/walk'), img_dur=10),
             'player/idle': Animation(load_images('player/idle'), img_dur=12),
+            'player/throwing': Animation(load_images('player/jump'), img_dur=-1),
+            'player/grappling': Animation(load_images('player/jump'), img_dur=-1),
+            'player/swinging': Animation(load_images('player/jump'), img_dur=-1),
+            'grapple': load_image('grapple/grapple.png'),           
         }
 
         self.player = Player(self, to_pos((3, 15)), (17, 32))
 
         self.sfx = {
-            'jump': load_sound('jump.wav')
+            'jump': load_sound('jump.wav'),
+            #'grapple': load_sound('grapple.wav'),
         }
 
         self.sfx['jump'].set_volume(0.6)
+        #self.sfx['grapple'].set_volume(0.6)
 
         self.camera = [0, 0]
 
@@ -58,7 +64,8 @@ class Game:
             self.screen.blit(pygame.transform.scale(self.display, SCREEN_SIZE), (0, 0))
             pygame.display.update()
             self.clock.tick(60)
+
             #print(to_grid(self.player.pos))
-            #print(self.player.action)
+            print(self.player.action)
             
 Game().run()
