@@ -1,5 +1,5 @@
 import pygame
-from scripts.constants import GRAVITY, TERM_VEL, JUMP_VEL, WALK_SPEED, THROW_SPEED, GRAPPLE_LENGTH, GRAPPLE_SPEED, SWING_SPEED
+from scripts.constants import GRAVITY, TERM_VEL, JUMP_VEL, WALK_SPEED, THROW_SPEED, GRAPPLE_LENGTH, GRAPPLE_SPEED, SWING_SPEED, SWING_CLEARANCE
 from scripts.utils import to_grid
 import math
 
@@ -125,6 +125,8 @@ class Player(Entity):
             self.velocity[1] = 1 # this *should* be 0, but this currently causes the player to
                                 # wiggle up and down, breaking collision on the ensuing frames :(
 
+        # if player doing a grapple action, run its grapple's update function.
+        # if grapple rope has run out of length, kill the grapple
         if self.action in self.grapple_actions:
             if self.grapple.length >= self.grapple.max_length:
                 del self.grapple
@@ -157,6 +159,7 @@ class Grapple(Entity):
         super().__init__(game, 'grapple', pos, size)
         self.player = player
         self.origin = list(pos)
+        self.original_origin = self.origin
         self.flip = player.flip
         self.velocity = [-THROW_SPEED, -THROW_SPEED] if self.flip else [THROW_SPEED, -THROW_SPEED] 
         self.length = 0
@@ -165,50 +168,83 @@ class Grapple(Entity):
         self.img = pygame.transform.scale2x(game.assets[self.kind].copy())
         self.handle_offset = (16, 16) if self.flip else (0, 16)
 
-    def move_player(self):# move player to origin
+    def player_to_origin(self):# move player to origin
                 sprite_offset = (1, -12) if self.flip else (-14, -12)
                 pos = [self.origin[0] + sprite_offset[0], self.origin[1] + sprite_offset[1]]
                 self.player.pos = pos
 
     def update(self, tilemap, movement=(0, 0)):
-
+        
         if not self.anchored:
-
-            # ascend until out of rope or collision
+            # run the parent update to ascend
             super().update(tilemap, movement)
+
+            # get position of the grapple handle in the sprite
+            # get the current length of the rope from its origin to the handle
             self.handle_pos = (self.pos[0] + self.handle_offset[0], self.pos[1] + self.handle_offset[1])
             self.length = math.dist(self.origin, self.handle_pos)
+
+            # if we collided anywhere during the current frame, become anchored
+            # update the player's action and store the current length as the length on anchor
             if any(self.collisions.values()):
                 self.anchored = True
                 self.player.set_action('grappling')
-                self.anchored_length = self.length
+                self.throw_y = self.
 
-        else:
+        elif self.anchored:
 
-            if self.length > (.65 * self.anchored_length):
+            # if we're anchored, check if the we have clearance to swing
+            #
+            #  probably need to use trigonometry
+            #
+            #   use current vertical rise 
+            #
+            #  total y rise from spawnpoint to handle plus the clearance constant
+            #
+            #   
+
+
+
+
+            if (self.original_origin[1] - self.origin[1]) + > SWING_CLEARANCE:
                 
-                # retract, moving the origin toward handle
-                self.length = math.dist(self.origin, self.handle_pos)
-                self.origin[0] = pygame.math.lerp(self.origin[0], self.handle_pos[0], GRAPPLE_SPEED)
-                self.origin[1] = pygame.math.lerp(self.origin[1], self.handle_pos[1], GRAPPLE_SPEED)
-                self.angle = math.atan2(abs(self.origin[0] - self.handle_pos[0]), self.origin[1] - self.handle_pos[1])
-                self.move_player()
+                # retract, moving origin toward handle
+                self.length = math.dist(self.origin, self.handle_pos) 
+
+                # lerp seems to move by consistent % not absolute speed
+                #self.origin[0] = pygame.math.lerp(self.origin[0], self.handle_pos[0], GRAPPLE_SPEED)
+                #self.origin[1] = pygame.math.lerp(self.origin[1], self.handle_pos[1], GRAPPLE_SPEED)
+
+                # I think this works better?
+                # increment / decrement origin x by a set amount
+                #   e.g. if origin x is left (less) it should grow
+                if  self.origin[0] < self.handle_pos[0]:
+                    self.origin[0]  += GRAPPLE_SPEED
+                elif self.origin[0] > self.handle_pos[0]:
+                    self.origin[0] -= GRAPPLE_SPEED
+                # (origin y should always be greater)
+                self.origin[1] -= GRAPPLE_SPEED
+
+                self.player_to_origin()
 
             else:
+
+                self.angle = math.atan2(abs(self.origin[0] - self.handle_pos[0]), self.origin[1] - self.handle_pos[1])
 
                 if math.sin(self.angle) >= .3:
                     # swing, moving origin in an arc
                     self.player.set_action('swinging')
                     self.origin[0] = self.handle_pos[0] + self.length * math.cos(self.angle)
                     self.origin[1] = self.handle_pos[1] + self.length * math.sin(self.angle)
-                    speed = SWING_SPEED if self.flip else -SWING_SPEED
-                    self.angle += speed
-                    self.move_player()
+
+                    self.angle += (SWING_SPEED if self.flip else -SWING_SPEED)
+                    self.player_to_origin()
                 else:
-                    self.player.velocity = [0, JUMP_VEL] # this ia cheating but it works for now
+                    self.player.velocity = [0, JUMP_VEL] # fix this, velocity should derive from linear speed of swing
                     
                     self.player.set_action('jump')
-                    del self.player.grapple
+                    del self.player.grapple # is this how/where to do this?
+                
 
     def render(self, surf, offset=(0, 0)):
         
@@ -219,14 +255,7 @@ class Grapple(Entity):
         screen_handle_pos = self.handle_pos[0] - offset[0], self.handle_pos[1] - offset[1]
         pygame.draw.line(surf, (94, 223, 177), screen_orig, screen_handle_pos, 3)
 
-
-
-
-
-
-
-
-
+'''
 class Enemy(Entity):
     def __init__(self, game, pos, size):
         super().__init__(game, 'enemy', pos, size)
@@ -236,3 +265,4 @@ class Enemy(Entity):
     
     def render(self, surf, offset=(0, 0)):
         return super().render(surf, offset)
+'''

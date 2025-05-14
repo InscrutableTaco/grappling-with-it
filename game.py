@@ -50,7 +50,9 @@ class Game:
             self.camera[1] += (self.player.rect().centery - self.display.get_height() / 2 - self.camera[1]) / 30
 
             self.tilemap.render(self.display, offset=self.camera)
+            
             frame_movement = ((self.movement[1] - self.movement[0]) * self.player.walk_speed, 0)
+
             self.player.update(self.tilemap, frame_movement)
             self.player.render(self.display, offset=self.camera)
 
@@ -63,9 +65,9 @@ class Game:
                             
             self.screen.blit(pygame.transform.scale(self.display, SCREEN_SIZE), (0, 0))
             pygame.display.update()
-            self.clock.tick(60)
+            self.clock.tick(30)
 
             #print(to_grid(self.player.pos))
-            print(self.player.action)
+            #print(self.player.action)
             
 Game().run()
