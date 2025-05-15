@@ -1,5 +1,5 @@
 import pygame
-from scripts.constants import GRAVITY, TERM_VEL, JUMP_VEL, WALK_SPEED, THROW_SPEED, GRAPPLE_LENGTH, GRAPPLE_SPEED, SWING_SPEED, SWING_CLEARANCE
+from scripts.constants import GRAVITY, TERM_VEL, JUMP_VEL, WALK_SPEED, THROW_SPEED, GRAPPLE_LENGTH, GRAPPLE_SPEED, SWING_SPEED, HORIZONTAL_DECAY
 from scripts.utils import to_grid
 import math
 
@@ -74,6 +74,12 @@ class Entity:
                         self.pos[1] = hitbox.y
             else:
                 raise Exception("Invalid axis")
+            
+    def decay_x_vel(self):
+        if self.velocity[0] > 0:
+            self.velocity[0] = max(0, self.velocity[0] - HORIZONTAL_DECAY)
+        if self.velocity[0] < 0:
+            self.velocity[0] = min(0, self.velocity[0] + HORIZONTAL_DECAY)
                     
     def update(self, tilemap, movement=(0, 0)):
         self.reset_collisions()
@@ -120,6 +126,8 @@ class Player(Entity):
         #update velocity w/ gravity
         self.velocity[1] = min(TERM_VEL, self.velocity[1] + GRAVITY)
 
+        self.decay_x_vel()
+
         #reset y velocity if colliding up or down. 
         if self.collisions['down'] or self.collisions['up']:
             self.velocity[1] = 1 # this *should* be 0, but this currently causes the player to
@@ -153,13 +161,14 @@ class Player(Entity):
         
         self.grapple = Grapple(self.game, pos, self, (8, 8))
         self.set_action('throwing')
+        self.game.sfx['throw'].play()
 
 class Grapple(Entity):
     def __init__(self, game, pos, player, size=(8, 8)):
         super().__init__(game, 'grapple', pos, size)
         self.player = player
         self.origin = list(pos)
-        self.original_origin = self.origin
+        self.original_origin = self.origin.copy()
         self.flip = player.flip
         self.velocity = [-THROW_SPEED, -THROW_SPEED] if self.flip else [THROW_SPEED, -THROW_SPEED] 
         self.length = 0
@@ -185,37 +194,24 @@ class Grapple(Entity):
             self.length = math.dist(self.origin, self.handle_pos)
 
             # if we collided anywhere during the current frame, become anchored
-            # update the player's action and store the current length as the length on anchor
+            # update the player's action
             if any(self.collisions.values()):
                 self.anchored = True
                 self.player.set_action('grappling')
-                self.throw_y = self.
+                self.game.sfx['grapple'].play()
 
         elif self.anchored:
 
-            # if we're anchored, check if the we have clearance to swing
-            #
-            #  probably need to use trigonometry
-            #
-            #   use current vertical rise 
-            #
-            #  total y rise from spawnpoint to handle plus the clearance constant
-            #
-            #   
-
-
-
-
-            if (self.original_origin[1] - self.origin[1]) + > SWING_CLEARANCE:
-                
-                # retract, moving origin toward handle
-                self.length = math.dist(self.origin, self.handle_pos) 
+            # if anchored, pull player up until there is clearance to swing
+            
+            # As long as current length greater than or equal to the original vertical rise...
+            if self.length >= self.original_origin[1] - self.handle_pos[1]:
 
                 # lerp seems to move by consistent % not absolute speed
                 #self.origin[0] = pygame.math.lerp(self.origin[0], self.handle_pos[0], GRAPPLE_SPEED)
                 #self.origin[1] = pygame.math.lerp(self.origin[1], self.handle_pos[1], GRAPPLE_SPEED)
 
-                # I think this works better?
+                # retract the rope by moving the origin diagonally
                 # increment / decrement origin x by a set amount
                 #   e.g. if origin x is left (less) it should grow
                 if  self.origin[0] < self.handle_pos[0]:
@@ -225,23 +221,39 @@ class Grapple(Entity):
                 # (origin y should always be greater)
                 self.origin[1] -= GRAPPLE_SPEED
 
+                # move player to origin, update length
                 self.player_to_origin()
+                self.length = math.dist(self.origin, self.handle_pos)
+                
+                # get angle, swing distance
+                self.angle = math.atan2((self.origin[1] - self.handle_pos[1]), self.length)
+                self.swing_x_dist = 2 * abs(self.origin[0] - self.handle_pos[0])
+                self.swing_x = self.origin[0]
 
+            # otherwise, swing
             else:
 
-                self.angle = math.atan2(abs(self.origin[0] - self.handle_pos[0]), self.origin[1] - self.handle_pos[1])
-
-                if math.sin(self.angle) >= .3:
-                    # swing, moving origin in an arc
-                    self.player.set_action('swinging')
+                # angle at the grapple point
+                #self.angle = math.acos((self.origin[1] - self.handle_pos[1]) / self.length)
+                
+                # swing, moving origin in an arc
+                self.player.set_action('swinging')
+                if self.flip:
                     self.origin[0] = self.handle_pos[0] + self.length * math.cos(self.angle)
-                    self.origin[1] = self.handle_pos[1] + self.length * math.sin(self.angle)
-
-                    self.angle += (SWING_SPEED if self.flip else -SWING_SPEED)
-                    self.player_to_origin()
                 else:
-                    self.player.velocity = [0, JUMP_VEL] # fix this, velocity should derive from linear speed of swing
-                    
+                    self.origin[0] = self.handle_pos[0] - self.length * math.cos(self.angle)
+                self.origin[1] = self.handle_pos[1] + self.length * math.sin(self.angle)
+
+                # increment the angle and move the player to origin
+                self.angle += SWING_SPEED
+                self.player_to_origin()
+
+                if abs(self.swing_x - self.origin[0]) > self.swing_x_dist:
+                
+                    if self.flip:
+                        self.player.velocity = [JUMP_VEL, JUMP_VEL] # fix this, velocity should derive from linear speed of swing
+                    else:
+                        self.player.velocity = [-JUMP_VEL, JUMP_VEL] # fix this, velocity should derive from linear speed of swing
                     self.player.set_action('jump')
                     del self.player.grapple # is this how/where to do this?
                 

@@ -32,11 +32,13 @@ class Game:
 
         self.sfx = {
             'jump': load_sound('jump.wav'),
-            #'grapple': load_sound('grapple.wav'),
+            'throw': load_sound('throw.wav'),
+            'grapple': load_sound('grapple.wav'),
         }
 
-        self.sfx['jump'].set_volume(0.6)
-        #self.sfx['grapple'].set_volume(0.6)
+        self.sfx['jump'].set_volume(0.5)
+        self.sfx['throw'].set_volume(.06)
+        self.sfx['grapple'].set_volume(0.6)
 
         self.camera = [0, 0]
 
@@ -65,7 +67,7 @@ class Game:
                             
             self.screen.blit(pygame.transform.scale(self.display, SCREEN_SIZE), (0, 0))
             pygame.display.update()
-            self.clock.tick(30)
+            self.clock.tick(60)
 
             #print(to_grid(self.player.pos))
             #print(self.player.action)

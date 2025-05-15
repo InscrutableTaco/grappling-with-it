@@ -36,13 +36,27 @@ class Tilemap:
 
         # test tiles
         for i in range(15):
-            loc = (4 * self.tile_size + (i * self.tile_size), 16 * self.tile_size)
+            loc = (4 * self.tile_size + (i * self.tile_size), 17 * self.tile_size)
             tile = Tile(Tile_type.DIRT, loc)
             self.tilemap[str(tile.grid_pos)] = tile
         for i in range(15):
-            loc = (4 * self.tile_size + (i * self.tile_size), 17 * self.tile_size)
+            loc = (4 * self.tile_size + (i * self.tile_size), 18 * self.tile_size)
             tile = Tile(Tile_type.DIRT, loc, 4)
             self.tilemap[str(tile.grid_pos)] = tile
+
+        for i in range(45):
+            loc = (4 * self.tile_size + (i * self.tile_size), 26 * self.tile_size)
+            tile = Tile(Tile_type.DIRT, loc)
+            self.tilemap[str(tile.grid_pos)] = tile
+        for i in range(45):
+            loc = (4 * self.tile_size + (i * self.tile_size), 27 * self.tile_size)
+            tile = Tile(Tile_type.DIRT, loc, 4)
+            self.tilemap[str(tile.grid_pos)] = tile
+
+        self.add_tile((4, 26), 7)
+        self.add_tile((4, 27), 5)
+        self.add_tile((49, 26), 1)
+        self.add_tile((49, 27), 3)
 
         for i in range(6):
             loc = (18 * self.tile_size + (i * self.tile_size), 12 * self.tile_size)
@@ -67,15 +81,53 @@ class Tilemap:
         self.add_tile((11, 9), 1)
         self.add_tile((11, 10), 3)
 
-        self.add_tile((3, 16), 7)
-        self.add_tile((3, 17), 5)
-        self.add_tile((19, 16), 1)
-        self.add_tile((19, 17), 3)
+        self.add_tile((3, 17), 7)
+        self.add_tile((3, 18), 5)
+        self.add_tile((19, 17), 1)
+        self.add_tile((19, 18), 3)
 
         self.add_tile((17, 12), 7)
         self.add_tile((17, 13), 5)
         self.add_tile((24, 12), 1)
         self.add_tile((24, 13), 3)
+
+        self.add_tile((12, 3), 7)
+        self.add_tile((12, 4), 5)
+        self.add_tile((13, 3), 1)
+        self.add_tile((13, 4), 3)
+
+        self.add_tile((24, 3), 7)
+        self.add_tile((24, 4), 5)
+        self.add_tile((25, 3), 0)
+        self.add_tile((25, 4), 4)
+        self.add_tile((26, 3), 0)
+        self.add_tile((26, 4), 4)
+        self.add_tile((27, 3), 0)
+        self.add_tile((27, 4), 4)
+        self.add_tile((28, 3), 0)
+        self.add_tile((28, 4), 4)
+        self.add_tile((29, 3), 1)
+        self.add_tile((29, 4), 3)
+
+        self.add_tile((34, 3), 7)
+        self.add_tile((34, 4), 5)
+        self.add_tile((35, 3), 0)
+        self.add_tile((35, 4), 4)
+        self.add_tile((36, 3), 1)
+        self.add_tile((36, 4), 3)
+
+        self.add_tile((31, 12), 7)
+        self.add_tile((31, 13), 5)
+        self.add_tile((32, 12), 0)
+        self.add_tile((32, 13), 4)
+        self.add_tile((33, 12), 0)
+        self.add_tile((33, 13), 4)
+        self.add_tile((34, 12), 0)
+        self.add_tile((34, 13), 4)
+        self.add_tile((35, 12), 0)
+        self.add_tile((35, 13), 4)
+        self.add_tile((36, 12), 1)
+        self.add_tile((36, 13), 3)
         
     def add_tile(self, grid_pos, variant):
         tile = Tile(Tile_type.DIRT, to_pos(grid_pos), variant)
