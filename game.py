@@ -45,6 +45,9 @@ class Game:
         self.tilemap = Tilemap(self)
 
     def run(self):
+        pygame.mixer.music.load('data/music/grappling with it.wav')
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1)
         while True:
             self.display.fill((0, 0, 0))
 
