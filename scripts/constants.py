@@ -7,6 +7,7 @@ WINDOW_TITLE = "Grappling With It!"
 #physics
 GRAVITY = 0.6
 TERM_VEL = 15
+HORIZONTAL_DECAY = .5
 
 #player attributes
 JUMP_VEL = -14
@@ -15,7 +16,6 @@ THROW_SPEED = 10
 GRAPPLE_LENGTH = 750
 GRAPPLE_SPEED = 7
 SWING_SPEED = .11
-HORIZONTAL_DECAY = .5
 
 #file pathing
 ART_PATH = "data/art/"
