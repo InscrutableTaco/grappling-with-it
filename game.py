@@ -1,6 +1,6 @@
 import pygame
 import sys
-from scripts.utils import load_image, load_images, load_sound, to_grid, to_pos, Animation
+from scripts.utils import load_image, load_images, load_sound, to_grid, to_pos, Animation, load_music, play_music, set_volume, queue_music
 from scripts.constants import SCREEN_SIZE, DISPLAY_SIZE, WINDOW_TITLE
 from scripts.entities import Player
 from scripts.bindings import Bindings
@@ -45,9 +45,10 @@ class Game:
         self.tilemap = Tilemap(self)
 
     def run(self):
-        pygame.mixer.music.load('data/music/grappling with it.wav')
-        pygame.mixer.music.set_volume(0.5)
-        pygame.mixer.music.play(-1)
+        load_music('grappling with it intro.wav')
+        set_volume(0.5)
+        play_music()
+        queue_music('grappling with it loop.wav', loops=-1)
         while True:
             self.display.fill((0, 0, 0))
 

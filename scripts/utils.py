@@ -19,6 +19,19 @@ def load_sound(path):
     sound = pygame.mixer.Sound(SFX_PATH + path)
     return sound
 
+def load_music(path):
+    music = pygame.mixer.music.load(MUSIC_PATH + path)
+    return music
+
+def set_volume(vol):
+    pygame.mixer.music.set_volume(vol)
+
+def play_music():
+    pygame.mixer.music.play()
+
+def queue_music(path, loops=-1):
+    pygame.mixer.music.queue(MUSIC_PATH + path, loops=loops)
+
 def to_grid(pos):
     return [int(pos[0] // TILE_SIZE), int(pos[1] // TILE_SIZE)]
 
