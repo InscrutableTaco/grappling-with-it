@@ -45,10 +45,12 @@ class Game:
         self.tilemap = Tilemap(self)
 
     def run(self):
+        
         load_music('grappling with it intro.wav')
         set_volume(0.5)
         play_music()
         queue_music('grappling with it loop.wav', loops=-1)
+        
         while True:
             self.display.fill((0, 0, 0))
 
