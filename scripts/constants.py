@@ -10,6 +10,7 @@ TERM_VEL = 15
 HORIZONTAL_DECAY = .5
 
 #player attributes
+SPAWN_POS = (20, 10)
 JUMP_VEL = -14
 WALK_SPEED = 5
 THROW_SPEED = 10

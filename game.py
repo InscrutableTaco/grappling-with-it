@@ -1,7 +1,7 @@
 import pygame
 import sys
 from scripts.utils import load_image, load_images, load_sound, to_grid, to_pos, Animation, load_music, play_music, set_volume, queue_music
-from scripts.constants import SCREEN_SIZE, DISPLAY_SIZE, WINDOW_TITLE
+from scripts.constants import SCREEN_SIZE, DISPLAY_SIZE, WINDOW_TITLE, SPAWN_POS
 from scripts.entities import Player
 from scripts.bindings import Bindings
 from scripts.tilemap import Tilemap
@@ -28,7 +28,7 @@ class Game:
             'grapple': load_image('grapple/grapple.png'),           
         }
 
-        self.player = Player(self, to_pos((3, 15)), (17, 32))
+        self.player = Player(self, to_pos(SPAWN_POS), (17, 32))
 
         self.sfx = {
             'jump': load_sound('jump.wav'),
@@ -50,7 +50,7 @@ class Game:
         set_volume(0.5)
         play_music()
         queue_music('grappling with it loop.wav', loops=-1)
-        
+
         while True:
             self.display.fill((0, 0, 0))
 
